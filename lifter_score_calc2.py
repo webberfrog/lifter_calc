@@ -29,6 +29,27 @@ def derivative_wrt_bw_dots(bw, total, coeffs, h=1e-3):
     s_minus = calculate_score_dots(bw - h, total, coeffs)
     return (s_plus - s_minus) / (2 * h)
 
+# ----- Derivative of required total vs BW for fixed scores -----
+def fixed_score_total_derivative_gl(bw, coeffs, fixed_score, h=1e-3):
+    def total_from_bw(bw_val):
+        a, b, c = coeffs
+        denom = a - b * np.exp(-1 * c * bw_val)
+        return (fixed_score / 100) * denom
+
+    total_plus = total_from_bw(bw + h)
+    total_minus = total_from_bw(bw - h)
+    return (total_plus - total_minus) / (2 * h)
+
+def fixed_score_total_derivative_dots(bw, coeffs, fixed_score, h=1e-3):
+    def total_from_bw(bw_val):
+        a, b, c, d, e = coeffs
+        denom = a + b*bw_val + c*bw_val**2 + d*bw_val**3 + e*bw_val**4
+        return (fixed_score / 500) * denom
+
+    total_plus = total_from_bw(bw + h)
+    total_minus = total_from_bw(bw - h)
+    return (total_plus - total_minus) / (2 * h)
+
 # ----- User input -----
 gender = input("Enter gender (male/female): ").strip().lower()
 if gender == "male":
@@ -56,6 +77,10 @@ user_dots = calculate_score_dots(user_bw, user_total, dots_coeffs)
 gl_deriv = derivative_wrt_bw_gl(user_bw, user_total, gl_coeffs)
 dots_deriv = derivative_wrt_bw_dots(user_bw, user_total, dots_coeffs)
 
+# Compute derivatives at user's bodyweight
+dtotal_dbw_gl = fixed_score_total_derivative_gl(user_bw, gl_coeffs, user_gl)
+dtotal_dbw_dots = fixed_score_total_derivative_dots(user_bw, dots_coeffs, user_dots)
+
 # ----- Output Results -----
 print(f"\n--- Results ({gender.capitalize()}) ---")
 print(f"Bodyweight: {user_bw:.2f} kg")
@@ -64,6 +89,9 @@ print(f"GL Points:  {user_gl:.2f}")
 print(f"DOTS Score: {user_dots:.2f}")
 print(f"∂GL/∂BW:    {gl_deriv:.4f} points/kg")
 print(f"∂DOTS/∂BW:  {dots_deriv:.4f} points/kg")
+
+print(f"dTotal/dBW @ fixed GL:    {dtotal_dbw_gl:.4f} kg/kg")
+print(f"dTotal/dBW @ fixed DOTS:  {dtotal_dbw_dots:.4f} kg/kg")
 
 # ----- Surface Plot Ranges -----
 bw_range = np.linspace(40, 150, 100)
