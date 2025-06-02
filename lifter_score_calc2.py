@@ -110,5 +110,24 @@ plt.ylabel('GL Points')
 plt.grid(True)
 plt.legend()
 
+# ----- 2D Plot: Total vs Bodyweight for Fixed GL Score -----
+bw_vals = np.linspace(40, 150, 300)
+# Invert the GL formula to find total required to maintain same GL score
+required_totals = []
+for bw in bw_vals:
+    a, b, c = gl_coeffs
+    denominator = a - b * np.exp(-1 * c * bw)
+    total_required = (user_gl / 100) * denominator
+    required_totals.append(total_required)
+
+fig4 = plt.figure(figsize=(10, 6))
+plt.plot(bw_vals, required_totals, label=f'Total needed for {user_gl:.1f} GL Points')
+plt.scatter(user_bw, user_total, color='red', zorder=5, label='Your Score')
+plt.title(f'Total vs Bodyweight for GL = {user_gl:.1f}')
+plt.xlabel('Bodyweight (kg)')
+plt.ylabel('Total (kg)')
+plt.grid(True)
+plt.legend()
+
 plt.tight_layout()
 plt.show()
