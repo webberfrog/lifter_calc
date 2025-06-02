@@ -24,6 +24,8 @@ This tool supports both **male** and **female** coefficient systems, and generat
   - Your input highlighted with a red marker
 - ✅ 2D plot:
   - GL Points vs Total at your input bodyweight
+  - Total vs bodyweight at your fixed gl score/dots score
+
 
 ---
 
