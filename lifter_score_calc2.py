@@ -113,17 +113,27 @@ plt.legend()
 # ----- 2D Plot: Total vs Bodyweight for Fixed GL Score -----
 bw_vals = np.linspace(40, 150, 300)
 # Invert the GL formula to find total required to maintain same GL score
-required_totals = []
+required_totals_gl = []
 for bw in bw_vals:
     a, b, c = gl_coeffs
     denominator = a - b * np.exp(-1 * c * bw)
     total_required = (user_gl / 100) * denominator
-    required_totals.append(total_required)
+    required_totals_gl.append(total_required)
 
+# Calculate totals required to maintain fixed DOTS score
+required_totals_dots = []
+for bw in bw_vals:
+    a, b, c, d, e = dots_coeffs
+    denominator = a + b * bw + c * bw**2 + d * bw**3 + e * bw**4
+    total_required = (user_dots / 500) * denominator
+    required_totals_dots.append(total_required)
+
+# Plot both curves
 fig4 = plt.figure(figsize=(10, 6))
-plt.plot(bw_vals, required_totals, label=f'Total needed for {user_gl:.1f} GL Points')
+plt.plot(bw_vals, required_totals_gl, label=f'Total for {user_gl:.1f} GL Points', color='blue')
+plt.plot(bw_vals, required_totals_dots, label=f'Total for {user_dots:.1f} DOTS Score', color='green')
 plt.scatter(user_bw, user_total, color='red', zorder=5, label='Your Score')
-plt.title(f'Total vs Bodyweight for GL = {user_gl:.1f}')
+plt.title(f'Total vs Bodyweight for Fixed Scores ({gender.capitalize()})')
 plt.xlabel('Bodyweight (kg)')
 plt.ylabel('Total (kg)')
 plt.grid(True)
